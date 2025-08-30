@@ -9,9 +9,6 @@ import { MatchesController } from './matches/matches.controller';
 import { ResearchDocumentsController } from './research-documents/research-documents.controller';
 import { AnalyticsController } from './analytics/analytics.controller';
 import { NotificationsController } from './notifications/notifications.controller';
-import { SchedulingController } from './scheduling/scheduling.controller';
-import { CommonController } from './common/common.controller';
-import { CommonModule } from './common/common.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { SchedulingModule } from './scheduling/scheduling.module';
@@ -23,8 +20,28 @@ import { ClientsModule } from './clients/clients.module';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [CommonModule, AnalyticsModule, NotificationsModule, SchedulingModule, ResearchDocumentsModule, MatchesModule, VendorsModule, ProjectsModule, ClientsModule, AuthModule],
-  controllers: [AppController, AuthController, ClientsController, ProjectsController, VendorsController, MatchesController, ResearchDocumentsController, AnalyticsController, NotificationsController, SchedulingController, CommonController],
+  imports: [
+    AnalyticsModule,
+    NotificationsModule,
+    SchedulingModule,
+    ResearchDocumentsModule,
+    MatchesModule,
+    VendorsModule,
+    ProjectsModule,
+    ClientsModule,
+    AuthModule,
+  ],
+  controllers: [
+    AppController,
+    AuthController,
+    ClientsController,
+    ProjectsController,
+    VendorsController,
+    MatchesController,
+    ResearchDocumentsController,
+    AnalyticsController,
+    NotificationsController,
+  ],
   providers: [AppService],
 })
 export class AppModule {}
