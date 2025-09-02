@@ -1,20 +1,54 @@
-import { Injectable } from '@nestjs/common';
-import { UsersService } from '../users/users.service'; // Assuming you have a UsersService
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { ClientsService } from '../clients/clients.service';
+import { VendorsService } from '../vendors/vendors.service';
+import { RegisterDto } from './dtos/register.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private usersService: UsersService) {}
+  clientsRepo: any;
+  vendorsRepo: any;
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly clientsService: ClientsService,
+    private readonly vendorsService: VendorsService,
+  ) {}
 
-  async validateUser(username: string, pass: string): Promise<any> {
-    // This is a placeholder. You will need to implement the actual user validation logic here.
-    // This method should typically interact with a UsersService or a UsersRepository
-    // to find a user by username and then compare the provided password with the stored hashed password.
-    const user = await this.usersService.findOneByUsername(username); // Assuming findOneByUsername exists in UsersService
-    if (user && user.password === pass) {
-      // In a real app, compare hashed passwords
-      const { password, ...result } = user; // Exclude password from the returned object
-      return result;
+  // role: 'client' | 'vendor'
+  async validateUser(username: string, password: string) {
+    // 1- نشوف هل هو Client
+    const client = await this.clientsRepo.findOne({
+      where: { contact_email: username },
+    });
+
+    if (client && (await bcrypt.compare(password, client.password))) {
+      return { ...client, role: 'client' };
     }
+
+    // 2- نشوف هل هو Vendor
+    const vendor = await this.vendorsRepo.findOne({
+      where: { contact_email: username },
+    });
+
+    if (vendor && (await bcrypt.compare(password, vendor.password))) {
+      return { ...vendor, role: 'vendor' };
+    }
+
+    // 3- لو لا Client ولا Vendor
     return null;
+  }
+
+  async login(user: any) {
+    const payload = { sub: user.id, role: user.role };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
+  }
+
+  // optional: register helper that hashes password
+  async registerClient(dto: RegisterDto) {
+    const client = this.clientsRepo.create(dto);
+    return this.clientsRepo.save(client);
   }
 }

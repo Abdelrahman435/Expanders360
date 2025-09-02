@@ -1,17 +1,14 @@
-# بدل 18-alpine بـ 20-alpine
+# Build stage
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install build dependencies (python, make, g++, etc.)
-RUN apk add --no-cache python3 make g++ 
+RUN apk add --no-cache python3 make g++
 
 COPY package*.json ./
-COPY tsconfig*.json ./
+RUN npm install
 
-RUN npm ci && npm cache clean --force
-
-COPY src/ ./src/
+COPY . .
 
 RUN npm run build
 

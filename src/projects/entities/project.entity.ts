@@ -16,7 +16,7 @@ export class Project {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Client, (client) => client.projects)
+  @ManyToOne(() => Client, (client) => client.projects, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'client_id' })
   client: Client;
 
@@ -27,7 +27,7 @@ export class Project {
   country: string;
 
   @Column('json')
-  services_needed: string[];
+  services_needed: string[]; // ممكن لاحقاً تعمل جدول Services منفصل وتربطه بدل JSON
 
   @Column('decimal', { precision: 15, scale: 2 })
   budget: number;

@@ -8,18 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Apply Helmet for security headers
-  app.use(
-    helmet({
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'self'"],
-          styleSrc: ["'self'", "'unsafe-inline'"],
-          scriptSrc: ["'self'"],
-          imgSrc: ["'self'", 'data:', 'https:'],
-        },
-      },
-    }),
-  );
+  app.use(helmet({ contentSecurityPolicy: false }));
 
   // Enable CORS for all origins (adjust in production)
   app.enableCors({

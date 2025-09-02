@@ -17,7 +17,11 @@
     "test:watch": "cross-env NODE_ENV=test jest --watch --maxWorkers=1",
     "test:cov": "cross-env NODE_ENV=test jest --coverage",
     "test:debug": "cross-env NODE_ENV=test node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "cross-env NODE_ENV=test jest --config ./test/jest-e2e.json --maxWorkers=1"
+    "test:e2e": "cross-env NODE_ENV=test jest --config ./test/jest-e2e.json --maxWorkers=1",
+    "typeorm": "ts-node -r tsconfig-paths/register ./typeorm.config.ts",
+    "migration:generate": "typeorm migration:generate -d ./typeorm.config.ts src/migrations/Init",
+    "migration:run": "typeorm migration:run -d ./typeorm.config.ts",
+    "migration:revert": "typeorm migration:revert -d ./typeorm.config.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.13",
@@ -33,6 +37,7 @@
     "@nestjs/throttler": "^6.4.0",
     "@nestjs/typeorm": "^11.0.0",
     "@types/cookie-session": "^2.0.49",
+    "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "cookie-session": "^2.1.0",

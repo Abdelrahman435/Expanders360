@@ -17,14 +17,16 @@ export class Match {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Project, (project) => project.matches)
+  @ManyToOne(() => Project, (project) => project.matches, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'project_id' })
   project: Project;
 
   @Column()
   project_id: number;
 
-  @ManyToOne(() => Vendor, (vendor) => vendor.matches)
+  @ManyToOne(() => Vendor, (vendor) => vendor.matches, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'vendor_id' })
   vendor: Vendor;
 
