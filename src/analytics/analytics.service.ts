@@ -1,107 +1,91 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { MatchesRepository } from '../matches/matches.repository';
-import { ResearchDocumentsRepository } from '../research-documents/research-documents.repository';
-import { ProjectsRepository } from '../projects/projects.repository';
-import { VendorsRepository } from '../vendors/vendors.repository';
-
-interface TopVendorsByCountry {
-  country: string;
-  vendors: {
-    vendor_id: number;
-    vendor_name: string;
-    avg_score: number;
-    match_count: number;
-  }[];
-  expansion_documents_count: number;
-}
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, DataSource } from 'typeorm';
+import { Match } from '../matches/entities/match.entity';
+import { Vendor } from '../vendors/entities/vendor.entity';
+import { Project } from '../projects/entities/project.entity';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import {
+  ResearchDocument,
+  ResearchDocumentDocument,
+} from '../research-documents/schemas/research-document.schema';
 
 @Injectable()
 export class AnalyticsService {
-  private readonly logger = new Logger(AnalyticsService.name);
-
   constructor(
-    private readonly matchesRepository: MatchesRepository,
-    private readonly researchDocumentsRepository: ResearchDocumentsRepository,
-    private readonly projectsRepository: ProjectsRepository,
-    private readonly vendorsRepository: VendorsRepository, // Inject VendorsRepository
+    private readonly dataSource: DataSource,
+
+    @InjectRepository(Match)
+    private readonly matchesRepo: Repository<Match>,
+
+    @InjectRepository(Vendor)
+    private readonly vendorsRepo: Repository<Vendor>,
+
+    @InjectRepository(Project)
+    private readonly projectsRepo: Repository<Project>,
+
+    @InjectModel(ResearchDocument.name)
+    private researchDocModel: Model<ResearchDocumentDocument>,
   ) {}
 
-  async getTopVendorsByCountry(
-    days: number = 30,
-  ): Promise<TopVendorsByCountry[]> {
-    this.logger.log(
-      `Generating top vendors by country report for last ${days} days`,
-    );
+  async getTopVendorsPerCountry() {
+    const last30Days = new Date();
+    last30Days.setDate(last30Days.getDate() - 30);
 
-    // Step 1: Get average scores by country and vendor from MySQL
-    const vendorScores =
-      await this.matchesRepository.getAverageScoreByCountryAndVendor(days);
+    const raw = await this.matchesRepo
+      .createQueryBuilder('m')
+      .select('p.country', 'country')
+      .addSelect('v.id', 'vendor_id')
+      .addSelect('v.name', 'vendor_name')
+      .addSelect('AVG(m.score)', 'avg_score')
+      .innerJoin('m.vendor', 'v')
+      .innerJoin('m.project', 'p')
+      .where('m.created_at >= :date', { date: last30Days })
+      .groupBy('p.country, v.id, v.name')
+      .orderBy('p.country')
+      .addOrderBy('avg_score', 'DESC')
+      .getRawMany();
 
-    // Step 2: Group by country and get top 3 vendors per country
-    const countryGroups = this.groupVendorsByCountry(vendorScores);
-
-    // Step 3: For each country, get expansion project document counts from MongoDB
-    const result: TopVendorsByCountry[] = [];
-
-    for (const [country, vendors] of Object.entries(countryGroups)) {
-      // Get expansion projects for this country
-      const expansionProjects =
-        await this.projectsRepository.findExpansionProjectsByCountry(country);
-      const projectIds = expansionProjects.map((p) => p.id);
-
-      // Count documents for these expansion projects
-      let expansionDocumentsCount = 0;
-      if (projectIds.length > 0) {
-        const documents =
-          await this.researchDocumentsRepository.findExpansionProjectDocuments(
-            projectIds,
-          );
-        expansionDocumentsCount = documents.length;
-      }
-
-      result.push({
-        country,
-        vendors: vendors.slice(0, 3), // Top 3 vendors
-        expansion_documents_count: expansionDocumentsCount,
+    //Group vendors per country
+    const grouped: Record<string, any[]> = {};
+    for (const row of raw) {
+      if (!grouped[row.country]) grouped[row.country] = [];
+      grouped[row.country].push({
+        vendorId: row.vendor_id,
+        name: row.vendor_name,
+        avgScore: Number(row.avg_score),
       });
     }
 
-    this.logger.log(`Generated report for ${result.length} countries`);
-    return result.sort((a, b) => a.country.localeCompare(b.country));
-  }
-
-  private groupVendorsByCountry(vendorScores: any[]): Record<string, any[]> {
-    const groups: Record<string, any[]> = {}; // Corrected type annotation
-
-    for (const score of vendorScores) {
-      if (!groups[score.country]) {
-        groups[score.country] = [];
-      }
-
-      groups[score.country].push({
-        vendor_id: score.vendor_id,
-        vendor_name: score.vendor_name,
-        avg_score: parseFloat(score.avg_score),
-        match_count: parseInt(score.match_count),
-      });
+    for (const country of Object.keys(grouped)) {
+      grouped[country] = grouped[country].slice(0, 3);
     }
 
-    // Sort vendors within each country by average score (descending)
-    for (const country in groups) {
-      groups[country].sort((a, b) => b.avg_score - a.avg_score);
+    const expansionProjects = await this.projectsRepo.find({
+      where: { is_expansion_project: true },
+      select: ['id', 'country'],
+    });
+
+    const projectIds = expansionProjects.map((p) => p.id);
+    const docs = await this.researchDocModel.aggregate([
+      { $match: { projectId: { $in: projectIds } } },
+      { $group: { _id: '$projectId', count: { $sum: 1 } } },
+    ]);
+
+    const projectDocMap = Object.fromEntries(docs.map((d) => [d._id, d.count]));
+
+    const countryDocCounts: Record<string, number> = {};
+    for (const project of expansionProjects) {
+      const count = projectDocMap[project.id] || 0;
+      countryDocCounts[project.country] =
+        (countryDocCounts[project.country] || 0) + count;
     }
 
-    return groups;
-  }
-
-  async getSystemOverview(): Promise<any> {
-    // This method could provide general system statistics
-    return {
-      total_projects: await this.projectsRepository.count(),
-      active_projects: await this.projectsRepository.countByStatus('active'),
-      total_vendors: await this.vendorsRepository.count(),
-      total_matches: await this.matchesRepository.count(),
-      total_documents: await this.researchDocumentsRepository.count(),
-    };
+    return Object.keys(grouped).map((country) => ({
+      country,
+      topVendors: grouped[country],
+      expansionDocsCount: countryDocCounts[country] || 0,
+    }));
   }
 }

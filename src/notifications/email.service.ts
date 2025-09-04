@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import * as nodemailer from 'nodemailer';
 
 interface MatchNotificationData {
   to: string;
@@ -19,7 +20,7 @@ export class EmailService {
   private readonly isProduction: boolean;
 
   constructor(private readonly configService: ConfigService) {
-    this.isProduction = this.configService.get('NODE_ENV') === 'production';
+    this.isProduction = this.configService.get('NODE_ENV') === 'development';
   }
 
   async sendMatchNotification(data: MatchNotificationData): Promise<void> {
@@ -67,11 +68,25 @@ export class EmailService {
     body: string,
   ): Promise<void> {
     if (this.isProduction) {
-      // In production, integrate with actual email service (SendGrid, AWS SES, etc.)
-      // For now, we'll use a mock implementation
-      this.logger.log(`[PRODUCTION] Email sent to ${to}: ${subject}`);
+      const transporter = nodemailer.createTransport({
+        host: this.configService.get('SMTP_HOST'),
+        port: this.configService.get('SMTP_PORT'),
+        secure: false,
+        auth: {
+          user: this.configService.get('SMTP_USER'),
+          pass: this.configService.get('SMTP_PASS'),
+        },
+      });
+
+      await transporter.sendMail({
+        from: this.configService.get('SMTP_USER'),
+        to,
+        subject,
+        text: body,
+      });
+
+      this.logger.log(`[SMTP] Email sent to ${to}: ${subject}`);
     } else {
-      // In development/testing, log the email instead of sending
       this.logger.log(
         `[MOCK EMAIL] To: ${to}, Subject: ${subject}, Body: ${body}`,
       );

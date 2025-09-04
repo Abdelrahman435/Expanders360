@@ -5,10 +5,10 @@ export type ResearchDocumentDocument = ResearchDocument & Document;
 
 @Schema({ timestamps: true })
 export class ResearchDocument {
-  id: string; // Explicitly add id property for TypeScript compatibility
+  id: string; //Explicitly add id property for TypeScript compatibility
 
   @Prop({ required: true })
-  projectId: number; // Reference to MySQL Project.id
+  projectId: number; //Reference to MySQL Project.id
 
   @Prop({ required: true, maxlength: 500 })
   title: string;
@@ -48,7 +48,7 @@ export class ResearchDocument {
 export const ResearchDocumentSchema =
   SchemaFactory.createForClass(ResearchDocument);
 
-// Create indexes for better search performance
+//Create indexes for better search performance
 ResearchDocumentSchema.index({ projectId: 1 });
 ResearchDocumentSchema.index({ title: 'text', content: 'text' });
 ResearchDocumentSchema.index({ tags: 1 });

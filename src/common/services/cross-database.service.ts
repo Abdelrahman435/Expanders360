@@ -21,10 +21,10 @@ export class CrossDatabaseService {
     const createdDocuments: ResearchDocument[] = [];
 
     try {
-      // Step 1: Create project in MySQL
+      //Step 1: Create project in MySQL
       createdProject = await this.projectsRepository.create(createProjectDto);
 
-      // Step 2: Create documents in MongoDB with project reference
+      //Step 2: Create documents in MongoDB with project reference
       for (const docDto of documents) {
         docDto.projectId = createdProject.id;
         const document = await this.researchDocumentsRepository.create(docDto);
@@ -33,13 +33,11 @@ export class CrossDatabaseService {
 
       return { project: createdProject, documents: createdDocuments };
     } catch (error) {
-      // Compensating actions in case of failure
       if (createdProject) {
         await this.projectsRepository.remove(createdProject.id);
       }
 
       for (const doc of createdDocuments) {
-        // Use doc.id (Mongoose virtual getter for _id) or ensure _id is typed on ResearchDocument
         await this.researchDocumentsRepository.remove(doc.id);
       }
 

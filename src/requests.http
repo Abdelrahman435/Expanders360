@@ -1,0 +1,103 @@
+### Auth - Register Client
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+  "company_name": "Test2 Client",
+  "contact_email": "client2@test.com",
+  "password": "123456"
+}
+
+### Auth - Register Admin
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+  "company_name": "Admin Company",
+  "contact_email": "abdelrahmanhassanabbass@gmail.com",
+  "password": "123456",
+  "role": "admin"
+}
+
+### Auth - Login (Client)
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "email": "client2@test.com",
+  "password": "123456"
+}
+
+### Auth - Login (Admin)
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "email": "abdelrahmanhassanabbass@gmail.com",
+  "password": "123456"
+}
+
+
+### Vendors - Get All
+GET http://localhost:3000/vendors
+
+
+### Vendors - Create (Admin Only)
+POST http://localhost:3000/vendors
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjgsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1NzAxODAxNywiZXhwIjoxNzU3MTA0NDE3fQ.bWoou5VB6OXB_mQxP3YHcjfGBsDDWaAOc22X8NClTAA
+Content-Type: application/json
+
+{
+  "name": "Vendor A",
+  "countries_supported": ["Egypt", "UAE"],
+  "services_offered": ["consulting", "development"],
+  "rating": 4.5,
+  "response_sla_hours": 24,
+  "sla_expiry_date": "2024-08-01"
+}
+
+
+### Projects - Create (Client Only)
+POST http://localhost:3000/projects
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsInJvbGUiOiJjbGllbnQiLCJpYXQiOjE3NTcwMTUwMTMsImV4cCI6MTc1NzEwMTQxM30.hLzOIGBKdG_LRLffFYNscwMIIflrPd5K2bKV7qQU72k
+Content-Type: application/json
+
+{
+  "country": "Egypt",
+  "services_needed": ["consulting", "design"],
+  "budget": 50000,
+  "status": "active",
+  "is_expansion_project": false
+}
+
+
+### Projects - Rebuild Matches (Admin Only)
+POST http://localhost:3000/projects/9/matches/rebuild
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjgsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1NzAxODAxNywiZXhwIjoxNzU3MTA0NDE3fQ.bWoou5VB6OXB_mQxP3YHcjfGBsDDWaAOc22X8NClTAA
+
+### 4) Trigger Manual SLA Check (for testing without waiting cron)
+POST http://localhost:3000/scheduling/trigger-sla-check
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjgsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1NzAxODAxNywiZXhwIjoxNzU3MTA0NDE3fQ.bWoou5VB6OXB_mQxP3YHcjfGBsDDWaAOc22X8NClTAA
+
+### 5) Trigger Manual Match Refresh
+POST http://localhost:3000/scheduling/trigger-match-refresh
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjgsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1NzAxODAxNywiZXhwIjoxNzU3MTA0NDE3fQ.bWoou5VB6OXB_mQxP3YHcjfGBsDDWaAOc22X8NClTAA
+
+### Analytics - Top Vendors (Admin Only)
+GET http://localhost:3000/analytics/top-vendors
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjgsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1NzAxODAxNywiZXhwIjoxNzU3MTA0NDE3fQ.bWoou5VB6OXB_mQxP3YHcjfGBsDDWaAOc22X8NClTAA
+
+
+### Research Documents - Create
+POST http://localhost:3000/research-documents
+Content-Type: application/json
+
+{
+  "projectId": 1,
+  "title": "Expansion Plan Egypt",
+  "content": "Research content...",
+  "tags": ["expansion", "egypt"],
+  "author": "Analyst A",
+  "fileType": "pdf",
+  "language": "en"
+}

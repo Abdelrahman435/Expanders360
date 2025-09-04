@@ -7,10 +7,10 @@ import helmet from 'helmet';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Apply Helmet for security headers
+  //Apply Helmet for security headers
   app.use(helmet({ contentSecurityPolicy: false }));
 
-  // Enable CORS for all origins (adjust in production)
+  //Enable CORS for all origins (adjust in production)
   app.enableCors({
     origin:
       process.env.NODE_ENV === 'production' ? ['https://yourdomain.com'] : true,
@@ -18,16 +18,16 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
-  // Global validation pipe
+  //Global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
-      forbidNonWhitelisted: true, // Corrected typo
+      forbidNonWhitelisted: true, //Corrected typo
       transform: true,
     }),
   );
 
-  // Swagger documentation setup
+  //Swagger documentation setup
   const config = new DocumentBuilder()
     .setTitle('Project Vendor Matching API')
     .setDescription(

@@ -12,18 +12,18 @@ export class ClientsService {
     private clientsRepo: Repository<Client>,
   ) {}
 
-  // CREATE
+  //CREATE
   async create(createClientDto: CreateClientDto): Promise<Client> {
-    const client = this.clientsRepo.create(createClientDto); // instance واحد
-    return await this.clientsRepo.save(client); // بيرجع Client واحد
+    const client = this.clientsRepo.create(createClientDto); //instance واحد
+    return await this.clientsRepo.save(client); //بيرجع Client واحد
   }
 
-  // FIND ALL
+  //FIND ALL
   async findAll(): Promise<Client[]> {
     return await this.clientsRepo.find();
   }
 
-  // FIND ONE
+  //FIND ONE
   async findOne(id: number): Promise<Client> {
     const client = await this.clientsRepo.findOne({ where: { id } });
     if (!client) {
@@ -32,14 +32,14 @@ export class ClientsService {
     return client;
   }
 
-  // UPDATE
+  //UPDATE
   async update(id: number, updateClientDto: UpdateClientDto): Promise<Client> {
     const client = await this.findOne(id);
     const updated = Object.assign(client, updateClientDto);
     return await this.clientsRepo.save(updated);
   }
 
-  // DELETE
+  //DELETE
   async remove(id: number): Promise<void> {
     const result = await this.clientsRepo.delete(id);
     if (result.affected === 0) {

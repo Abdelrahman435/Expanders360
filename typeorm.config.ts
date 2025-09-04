@@ -1,4 +1,3 @@
-// typeorm.config.ts
 import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
 
@@ -11,6 +10,6 @@ export default new DataSource({
   username: process.env.MYSQL_USERNAME || 'root',
   password: process.env.MYSQL_PASSWORD || '',
   database: process.env.MYSQL_DATABASE || 'project_vendor_matching',
-  entities: [__dirname + '/src/**/*.entity{.ts,.js}'],
+  entities: [__dirname + '/src*.entity{.ts,.js}'],
   migrations: [__dirname + '/src/migrations/*{.ts,.js}'],
 });

@@ -1,0 +1,20 @@
+### 🟢 AUTH
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "email": "client1@test.com",
+  "password": "secret123"
+}
+
+### 🟢 Get All Projects (Client Role)
+GET http://localhost:3000/projects
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJjbGllbnQiLCJpYXQiOjE3NTcwMTQwNzAsImV4cCI6MTc1NzEwMDQ3MH0.kkQli5ac6ikY3zIGAWqb7NyzokrD9YNnV0Zk1kF9Fqo
+
+### 🟢 Rebuild Matches for Project (Admin or Client owns project)
+POST http://localhost:3000/projects/1/matches/rebuild
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJjbGllbnQiLCJpYXQiOjE3NTcwMTQwNzAsImV4cCI6MTc1NzEwMDQ3MH0.kkQli5ac6ikY3zIGAWqb7NyzokrD9YNnV0Zk1kF9Fqo
+
+### 🟢 Analytics: Top Vendors (Admin only)
+GET http://localhost:3000/analytics/top-vendors
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1NzAxNDEzMiwiZXhwIjoxNzU3MTAwNTMyfQ.WB_DEW6gcWlDB2BrFLra9uXGc-INpnYnkrYhMhKFU64

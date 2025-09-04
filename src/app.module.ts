@@ -32,12 +32,12 @@ const throttlerConfig: ThrottlerOptions[] = [
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: getMySQLConfig,
-      inject: [ConfigService], // ✅ تصحيح
+      inject: [ConfigService],
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: getMongoDBConfig,
-      inject: [ConfigService], // ✅ تصحيح
+      inject: [ConfigService],
     }),
     ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),

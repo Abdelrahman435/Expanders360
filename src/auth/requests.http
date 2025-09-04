@@ -1,0 +1,95 @@
+### Variables
+@baseUrl = http://localhost:3000
+@client_token = 
+@admin_token = 
+
+### Register a new client
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "company_name": "Test Client",
+  "contact_email": "client1@test.com",
+  "password": "secret123",
+  "role": "client"
+}
+
+### Register a new admin
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "company_name": "Admin Company",
+  "contact_email": "admin@test.com",
+  "password": "admin123",
+  "role": "admin"
+}
+
+### Login as client
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "client1@test.com",
+  "password": "secret123"
+}
+
+### Login as admin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@test.com",
+  "password": "admin123"
+}
+
+### Example: Get client projects (requires CLIENT token)
+GET {{baseUrl}}/projects
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJjbGllbnQiLCJpYXQiOjE3NTcwMTI2MDQsImV4cCI6MTc1NzA5OTAwNH0.D92_mo2BiYAppwP6i_UIVostd3w5Cn_hFRqahS-9e90
+
+### Example: Create a project (requires CLIENT token)
+POST {{baseUrl}}/projects
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJjbGllbnQiLCJpYXQiOjE3NTcwMTI2MDQsImV4cCI6MTc1NzA5OTAwNH0.D92_mo2BiYAppwP6i_UIVostd3w5Cn_hFRqahS-9e90
+Content-Type: application/json
+
+{
+  "country": "Egypt",
+  "services_needed": ["IT Support", "Cloud Hosting"],
+  "budget": 50000,
+  "status": "active"
+}
+
+### Example: Get all vendors (requires ADMIN token)
+GET {{baseUrl}}/vendors
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1NzAxMjY1OSwiZXhwIjoxNzU3MDk5MDU5fQ.G_X6jBkb78ymR8KLdQ4bHurs3OGIGOZowUVNfwS0HlM
+
+### Example: Create a vendor (requires ADMIN token)
+POST {{baseUrl}}/vendors
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1NzAxMjY1OSwiZXhwIjoxNzU3MDk5MDU5fQ.G_X6jBkb78ymR8KLdQ4bHurs3OGIGOZowUVNfwS0HlM
+Content-Type: application/json
+
+{
+  "name": "Vendor A",
+  "countries_supported": ["Egypt", "UAE"],
+  "services_offered": ["Cloud Hosting", "IT Support"],
+  "rating": 4.5,
+  "response_sla_hours": 24
+}
+
+### ===============================
+### 🟢 Research
+### ===============================
+
+### Add Research Document
+POST http://localhost:3000/research-documents
+Content-Type: application/json
+
+{
+  "projectId": 1,
+  "title": "Market Expansion Study",
+  "content": "This is the content of the report...",
+  "tags": ["expansion", "egypt"],
+  "author": "Analyst 1",
+  "fileType": "pdf",
+  "language": "en"
+}

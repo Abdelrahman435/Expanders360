@@ -3,18 +3,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MatchesService } from './matches.service';
 import { MatchesController } from './matches.controller';
 import { Match } from './entities/match.entity';
-import { MatchesRepository } from './matches.repository';
-import { ProjectsModule } from '../projects/projects.module';
-import { VendorsModule } from '../vendors/vendors.module';
+import { Project } from '../projects/entities/project.entity';
+import { Vendor } from '../vendors/entities/vendor.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Match]),
-    ProjectsModule, // MatchesService depends on ProjectsRepository
-    VendorsModule, // MatchesService depends on VendorsRepository
-  ],
+  imports: [TypeOrmModule.forFeature([Match, Project, Vendor])],
   controllers: [MatchesController],
-  providers: [MatchesService, MatchesRepository],
-  exports: [MatchesService, MatchesRepository, TypeOrmModule],
+  providers: [MatchesService],
+  exports: [MatchesService],
 })
 export class MatchesModule {}

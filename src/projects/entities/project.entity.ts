@@ -27,7 +27,7 @@ export class Project {
   country: string;
 
   @Column('json')
-  services_needed: string[]; // ممكن لاحقاً تعمل جدول Services منفصل وتربطه بدل JSON
+  services_needed: string[];
 
   @Column('decimal', { precision: 15, scale: 2 })
   budget: number;

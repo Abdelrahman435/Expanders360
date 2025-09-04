@@ -5,11 +5,13 @@ import { ProjectsController } from './projects.controller';
 import { Project } from './entities/project.entity';
 import { ProjectsRepository } from './projects.repository';
 import { ClientsModule } from '../clients/clients.module';
+import { MatchesModule } from 'src/matches/matches.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Project]),
-    ClientsModule, // Projects depend on Clients
+    ClientsModule, //Projects depend on Clients
+    MatchesModule,
   ],
   controllers: [ProjectsController],
   providers: [ProjectsService, ProjectsRepository],

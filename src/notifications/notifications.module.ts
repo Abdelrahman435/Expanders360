@@ -8,10 +8,10 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    ProjectsModule, // For ProjectsRepository
-    VendorsModule, // For VendorsRepository
-    EventEmitterModule, // For OnEvent decorator
-    ConfigModule, // For EmailService to access config
+    ProjectsModule, //For ProjectsRepository
+    VendorsModule, //For VendorsRepository
+    EventEmitterModule, //For OnEvent decorator
+    ConfigModule, //For EmailService to access config
   ],
   providers: [NotificationsService, EmailService],
   exports: [NotificationsService, EmailService],

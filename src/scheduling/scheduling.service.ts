@@ -49,13 +49,13 @@ export class SchedulingService {
     }
   }
 
-  @Cron('0 0 1 * *') // First day of every month at midnight
+  @Cron('0 0 1 * *') //First day of every month at midnight
   async handleMonthlyAnalyticsGeneration() {
     this.logger.log('Starting monthly analytics generation job');
 
     try {
-      // This could trigger analytics report generation
-      // Implementation would depend on specific analytics requirements
+      //This could trigger analytics report generation
+      //Implementation would depend on specific analytics requirements
       this.logger.log('Monthly analytics generation completed');
     } catch (error) {
       this.logger.error(
@@ -64,7 +64,7 @@ export class SchedulingService {
     }
   }
 
-  // Manual trigger for testing purposes
+  //Manual trigger for testing purposes
   async triggerMatchRefresh(): Promise<void> {
     this.logger.log('Manual match refresh triggered');
     await this.handleDailyMatchRefresh();

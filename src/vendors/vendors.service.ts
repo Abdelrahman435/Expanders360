@@ -7,16 +7,21 @@ import { Vendor } from './entities/vendor.entity';
 export class VendorsService {
   constructor(
     @InjectRepository(Vendor)
-    private readonly vendorsRepo: Repository<Vendor>,
+    private readonly vendorRepository: Repository<Vendor>,
   ) {}
 
-  async findByEmail(email: string): Promise<Vendor | undefined> {
-    return this.vendorsRepo
-      .createQueryBuilder('vendor')
-      .addSelect('vendor.passwordHash')
-      .where('vendor.email = :email', { email }) // تأكد اسم العمود عندك (email/contact_email)
-      .getOne();
+  async findAll() {
+    return this.vendorRepository.find();
   }
 
-  // create/update...
+  async createVendor(dto: any) {
+    const vendor = this.vendorRepository.create({
+      name: dto.name,
+      countries_supported: dto.countries_supported,
+      services_offered: dto.services_offered,
+      rating: dto.rating,
+      response_sla_hours: dto.response_sla_hours,
+    });
+    return this.vendorRepository.save(vendor);
+  }
 }

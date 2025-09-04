@@ -1,54 +1,47 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { ClientsService } from '../clients/clients.service';
-import { VendorsService } from '../vendors/vendors.service';
+import { Client } from '../clients/entities/client.entity';
 import { RegisterDto } from './dtos/register.dto';
 
 @Injectable()
 export class AuthService {
-  clientsRepo: any;
-  vendorsRepo: any;
   constructor(
-    private readonly jwtService: JwtService,
-    private readonly clientsService: ClientsService,
-    private readonly vendorsService: VendorsService,
+    private jwtService: JwtService,
+    @InjectRepository(Client)
+    private clientsRepo: Repository<Client>,
   ) {}
 
-  // role: 'client' | 'vendor'
-  async validateUser(username: string, password: string) {
-    // 1- نشوف هل هو Client
+  async validateClient(email: string, password: string): Promise<Client> {
     const client = await this.clientsRepo.findOne({
-      where: { contact_email: username },
+      where: { contact_email: email },
     });
+    if (!client) throw new UnauthorizedException('Invalid credentials');
 
-    if (client && (await bcrypt.compare(password, client.password))) {
-      return { ...client, role: 'client' };
-    }
+    const isMatch = await bcrypt.compare(password, client.password);
+    if (!isMatch) throw new UnauthorizedException('Invalid credentials');
 
-    // 2- نشوف هل هو Vendor
-    const vendor = await this.vendorsRepo.findOne({
-      where: { contact_email: username },
-    });
-
-    if (vendor && (await bcrypt.compare(password, vendor.password))) {
-      return { ...vendor, role: 'vendor' };
-    }
-
-    // 3- لو لا Client ولا Vendor
-    return null;
+    return client;
   }
 
-  async login(user: any) {
-    const payload = { sub: user.id, role: user.role };
+  async login(client: Client) {
+    const payload = { sub: client.id, role: client.role };
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(payload, {
+        secret: process.env.JWT_SECRET,
+      }),
     };
   }
 
-  // optional: register helper that hashes password
-  async registerClient(dto: RegisterDto) {
-    const client = this.clientsRepo.create(dto);
+  async register(data: RegisterDto) {
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const client = this.clientsRepo.create({
+      ...data,
+      password: hashedPassword,
+      role: data.role || 'client',
+    });
     return this.clientsRepo.save(client);
   }
 }

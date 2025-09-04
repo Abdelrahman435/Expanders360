@@ -47,13 +47,13 @@ export class NotificationsService {
     this.logger.log(
       `Match ${event.matchId} updated: score changed from ${event.oldScore} to ${event.newScore}`,
     );
-    // Implement additional logic if needed for match updates
+    //Implement additional logic if needed for match updates
   }
 
   @OnEvent('sla.expired')
   async handleSLAExpired(event: SLAExpiredEvent) {
     try {
-      // Send notification to admin about expired SLA
+      //Send notification to admin about expired SLA
       await this.emailService.sendSLAExpirationNotification({
         vendorName: event.vendorName,
         expiryDate: event.expiryDate,
